@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qfedu.mapper.CartItemMapper">
+    <resultMap id="BaseResultMap" type="com.qfedu.pojo.CartItem">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="gid" property="gid" jdbcType="INTEGER"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="cartid" property="cartid" jdbcType="INTEGER"/>
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <resultMap id="cartItemMap" type="com.qfedu.pojo.CartItem">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="gid" property="gid" jdbcType="INTEGER"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="cartid" property="cartid" jdbcType="INTEGER"/>
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP"/>
+        <association property="goods" javaType="Goods">
+            <id property="id" column="id"></id>
+            <result column="name" property="name"></result>
+            <result column="pubdate" property="pubdate"></result>
+            <result column="price" property="price"></result>
+            <result column="star" property="star"></result>
+            <result column="pic" property="pic"></result>
+            <result column="flag" property="flag"></result>
+            <result column="cid" property="cid"></result>
+            <result column="uid" property="uid"></result>
+            <result column="info" property="info" jdbcType="LONGVARCHAR"/>
+        </association>
+    </resultMap>
+
+
+
+    <sql id="Base_Column_List">
+    id, gid, count, cartid, createtime
+  </sql>
+
+
+    <select id="selectByUid" resultMap="cartItemMap">
+    SELECT  ci.count,g.price,g.name,g.pubdate,g.star,g.pic,g.info,g.flag
+    FROM t_cartitem ci LEFT JOIN t_cart c ON ci.cartid=c.id LEFT JOIN goods g ON ci.gid = g.id WHERE c.uid=#{uid}
+  </select>
+
+    <select id="selectByCid" resultMap="cartItemMap">
+        select ci.count ,ci.id,g.id gid,g.price,g.name,g.pubdate,g.star,g.pic,g.info,g.flag from t_cartitem ci left join goods g on ci.gid = g.id where ci.cartid=#{cartid}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_cartitem
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+
+    <insert id="insert" parameterType="com.qfedu.pojo.CartItem">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_cartitem (gid, count, cartid,
+        createtime)
+        values (#{gid}, #{count}, #{cartid},
+        now())
+    </insert>
+
+
+    <insert id="insertSelective" parameterType="com.qfedu.pojo.CartItem">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_cartitem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gid != null">
+                gid,
+            </if>
+            <if test="count != null">
+                count,
+            </if>
+            <if test="cartid != null">
+                cartid,
+            </if>
+            <if test="createtime != null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gid != null">
+                #{gid,jdbcType=INTEGER},
+            </if>
+            <if test="count != null">
+                #{count,jdbcType=INTEGER},
+            </if>
+            <if test="cartid != null">
+                #{cartid,jdbcType=INTEGER},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.qfedu.pojo.CartItem">
+        update t_cartitem
+        <set>
+            <if test="gid != null">
+                gid = #{gid,jdbcType=INTEGER},
+            </if>
+            <if test="count != null">
+                count = #{count,jdbcType=INTEGER},
+            </if>
+            <if test="cartid != null">
+                cartid = #{cartid,jdbcType=INTEGER},
+            </if>
+            <if test="createtime != null">
+                createtime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.qfedu.pojo.CartItem">
+    update t_cartitem
+    set gid = #{gid,jdbcType=INTEGER},
+      count = #{count,jdbcType=INTEGER},
+      cartid = #{cartid,jdbcType=INTEGER},
+      createtime = #{createtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

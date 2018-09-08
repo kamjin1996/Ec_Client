@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qfedu.mapper.RecInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.qfedu.pojo.RecInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uid" property="uid" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="INTEGER" />
+    <result column="proid" property="proid" jdbcType="INTEGER" />
+    <result column="cityid" property="cityid" jdbcType="INTEGER" />
+    <result column="counyid" property="counyid" jdbcType="INTEGER" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="flag" property="flag"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, uid, name, tel, proid, cityid, counyid, detail,flag
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_recinfo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <resultMap id="reMap" type="com.qfedu.pojo.RecInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uid" property="uid" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="INTEGER" />
+    <result column="proid" property="proid" jdbcType="INTEGER" />
+
+    <result column="proname" property="proname"/>
+    <result column="cityname" property="cityname" />
+    <result column="counyname" property="counyname" />
+
+    <result column="cityid" property="cityid" jdbcType="INTEGER" />
+    <result column="counyid" property="counyid" jdbcType="INTEGER" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="flag" property="flag"/>
+  </resultMap>
+
+
+
+
+
+    <select id="selectByUid" resultMap="reMap">
+      select re.*,p.name proname,ci.name cityname,co.name counyname from t_recinfo re left join t_province p on re.proid=p.id left join t_city ci on re.cityid =ci.id left join t_county co on re.counyid=co.id where re.uid=#{uid}
+    </select>
+
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_recinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <!--默认新增时，flag为0-->
+  <insert id="insert" parameterType="com.qfedu.pojo.RecInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_recinfo (uid, name, tel, 
+      proid, cityid, counyid, 
+      detail,flag)
+    values (#{uid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{tel,jdbcType=INTEGER}, 
+      #{proid,jdbcType=INTEGER}, #{cityid,jdbcType=INTEGER}, #{counyid,jdbcType=INTEGER}, 
+      #{detail,jdbcType=VARCHAR},0)
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.qfedu.pojo.RecInfo" >
+    update t_recinfo
+    <set >
+      <if test="uid != null">
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null and name != ''" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="tel != null and tel != ''" >
+        tel = #{tel,jdbcType=INTEGER},
+      </if>
+      <if test="proid != null" >
+        proid = #{proid,jdbcType=INTEGER},
+      </if>
+      <if test="cityid != null" >
+        cityid = #{cityid,jdbcType=INTEGER},
+      </if>
+      <if test="counyid != null" >
+        counyid = #{counyid,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null and detail!=''" >
+        detail = #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null" >
+        flag = #{flag},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--更改默认收货人信息时，将flag改为1-->
+  <update id="updateFlagById">
+    update t_recinfo set flag = #{flag} where id=#{id}
+  </update>
+
+  <update id="updateFlagByUid">
+    update t_recinfo set flag = 0 where uid=#{uid}
+  </update>
+
+</mapper>

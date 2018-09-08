@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qfedu.mapper.GoodsMapper">
+    <resultMap id="BaseResultMap" type="com.qfedu.pojo.Goods">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="pubdate" property="pubdate" jdbcType="DATE"/>
+        <result column="price" property="price" jdbcType="BIGINT"/>
+        <result column="star" property="star" jdbcType="INTEGER"/>
+        <result column="pic" property="pic" jdbcType="VARCHAR"/>
+        <result column="flag" property="flag" jdbcType="INTEGER"/>
+        <result column="cid" property="cid" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.qfedu.pojo.Goods" extends="BaseResultMap">
+        <result column="info" property="info" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, pubdate, price, star, pic, flag, cid, uid
+  </sql>
+    <sql id="Blob_Column_List">
+    info
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from goods
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <resultMap id="goodsMap" type="Goods">
+        <id property="id" column="id"></id>
+        <result column="name" property="name"></result>
+        <result column="pubdate" property="pubdate"></result>
+        <result column="price" property="price"></result>
+        <result column="star" property="star"></result>
+        <result column="pic" property="pic"></result>
+        <result column="flag" property="flag"></result>
+        <result column="cid" property="cid"></result>
+        <result column="uid" property="uid"></result>
+        <result column="info" property="info"></result>
+        <association property="category" javaType="Category">
+            <id property="id" column="id"></id>
+            <result property="cname" column="cname"></result>
+            <result property="level" column="level"></result>
+            <result property="parentid" column="parentid"></result>
+        </association>
+
+    </resultMap>
+    <resultMap id="goodsVoMap" type="GoodsVo">
+        <result column="cname" property="cname"></result>
+        <collection property="goods" ofType="Goods">
+            <id property="id" column="id"></id>
+            <result column="name" property="name"></result>
+            <result column="pubdate" property="pubdate"></result>
+            <result column="price" property="price"></result>
+            <result column="star" property="star"></result>
+            <result column="pic" property="pic"></result>
+            <result column="flag" property="flag"></result>
+            <result column="cid" property="cid"></result>
+            <result column="uid" property="uid"></result>
+            <result column="info" property="info"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectAllactive" resultMap="goodsVoMap">
+        select g.*,c.cname from goods g left join category c on g.cid=c.id
+        <where>
+            <if test="name != null and name != ''">
+              name like "%"#{name}"%"
+            </if>
+            <if test="pubdate != null and pubdate != ''">
+               and pubdate = #{pubdate}
+            </if>
+        </where>
+    </select>
+
+    <!--只需要flag为0的用户-->
+    <select id="selectAllByCid" resultType="com.qfedu.pojo.Goods">
+        select * from goods where flag=0 and cid=#{cid}
+    </select>
+
+
+</mapper>
